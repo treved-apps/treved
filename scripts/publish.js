@@ -25,9 +25,16 @@ for (const filePath of changedFiles) {
   if (!filePath.startsWith('posts/') || !filePath.endsWith('.md')) continue;
 
   const fileContent = fs.readFileSync(filePath, 'utf8');
+  
+  // matter() razdeli datoteko:
+  // - data vsebujemo metapodatke (title, date, summary)
+  // - content vsebuje zgolj vsebino (brez YAML headerja)
   const { data, content } = matter(fileContent);
 
+  // Naslov za Subject vzamemo iz headerja ali iz imena datoteke
   const title = data.title || path.basename(filePath, '.md');
+
+  // Pretvori samo vsebino (brez headerja) v HTML za Blogger
   const htmlContent = marked.parse(content);
 
   const mailOptions = {
