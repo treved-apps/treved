@@ -1,3 +1,12 @@
+---
+title: "Test"
+date: "2026-01-01
+summary: "This is for testing"
+---
+
+
+
+
 # Markdown priročnik
 
 To je primer **Markdown** datoteke, ki prikazuje najpogostejše oznake za oblikovanje besedila.
