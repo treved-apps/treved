@@ -1,2 +1,15 @@
 Vse .md datotekez objavami morajo biti tu.
 Te .txt datoteke ne smeš izbrisati, dokler ni tukaj vsaj ena druga datoteka.
+
+Vse .md datoteke z objavami morajo imeti tak formater:
+
+---
+title: "PrintPriceTool Web is Live!"
+date: "2026-10-02"
+summary: "You can now use PrintPriceTool directly in your browser without installing the Android app."
+---
+
+Tukaj pa napišeš celotno vsebino objave v standardnem Markdown formatu...
+
+
+To je nujno potrebno!
