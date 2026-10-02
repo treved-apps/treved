@@ -1,0 +1,2 @@
+Vse .md datotekez objavami morajo biti tu.
+Te .txt datoteke ne smeš izbrisati, dokler ni tukaj vsaj ena druga datoteka.
