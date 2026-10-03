@@ -79,4 +79,40 @@ for (const filePath of changedFiles) {
   } else {
     console.warn('DEVTO_API_KEY ni nastavljen v okoljskih spremenljivkah. Dev.to objava preskočena.');
   }
+
+
+  // 3. OBJAVA NA MASTODON
+  const mastodonToken = process.env.MASTODON_TOKEN;
+  const mastodonServer = process.env.MASTODON_SERVER || 'https://mastodon.social';
+
+  if (mastodonToken) {
+    try {
+      // Mastodon ima omejitev dolžine besedila, zato pošljemo naslov in povzetek
+      const statusText = `${title}\n\n${data.summary || ''}`;
+
+      const response = await fetch(`${mastodonServer}/api/v1/statuses`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${mastodonToken}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          status: statusText,
+        }),
+      });
+
+      if (response.ok) {
+        const resData = await response.json();
+        console.log(`Uspešno poslano na Mastodon: ${title} (${resData.url})`);
+      } else {
+        const errData = await response.json();
+        console.error(`Napaka Mastodon API (${response.status}):`, errData);
+      }
+    } catch (error) {
+      console.error(`Napaka pri povezavi z Mastodonom za ${filePath}:`, error);
+    }
+  }
+
+
+  
 }
