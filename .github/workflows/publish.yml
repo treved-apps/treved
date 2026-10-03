@@ -26,7 +26,7 @@ jobs:
       - name: Get changed markdown files
         id: changed-files
         run: |
-          FILES=$(git diff --name-only --diff-filter=AM HEAD~1 HEAD | grep '^posts/.*\.md$' | xargs)
+          FILES=$(git diff --name-only --diff-filter=AM HEAD~1 HEAD | grep '^posts/.*\.md$' | xargs || true)
           echo "files=$FILES" >> $GITHUB_OUTPUT
 
       - name: Publish to Blogger
