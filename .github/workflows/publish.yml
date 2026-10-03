@@ -45,4 +45,6 @@ jobs:
 
           BLUESKY_HANDLE: ${{ secrets.BLUESKY_HANDLE }}
           BLUESKY_PASSWORD: ${{ secrets.BLUESKY_PASSWORD }}
+
+          GITHUB_EVENT_NAME: ${{ github.event_name }}
         run: node scripts/publish.js ${{ steps.changed-files.outputs.files }}
