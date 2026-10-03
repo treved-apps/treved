@@ -12,4 +12,7 @@ summary: "You can now use PrintPriceTool directly in your browser without instal
 Tukaj pa napišeš celotno vsebino objave v standardnem Markdown formatu...
 
 
+Če želimo, da se vse datoteke ponovno objavijo, moramo dodati konfiguracijsko datoteko posts/postConfig.txt z vsebino scan-and-post-all.
+
+
 To je nujno potrebno!
