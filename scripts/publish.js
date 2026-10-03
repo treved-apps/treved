@@ -25,18 +25,12 @@ for (const filePath of changedFiles) {
   if (!filePath.startsWith('posts/') || !filePath.endsWith('.md')) continue;
 
   const fileContent = fs.readFileSync(filePath, 'utf8');
-  
-  // matter() razdeli datoteko:
-  // - data vsebujemo metapodatke (title, date, summary)
-  // - content vsebuje zgolj vsebino (brez YAML headerja)
   const { data, content } = matter(fileContent);
 
-  // Naslov za Subject vzamemo iz headerja ali iz imena datoteke
   const title = data.title || path.basename(filePath, '.md');
 
-  // Pretvori samo vsebino (brez headerja) v HTML za Blogger
+  // 1. OBJAVA NA BLOGGER (preko SMTP / HTML)
   const htmlContent = marked.parse(content);
-
   const mailOptions = {
     from: process.env.SMTP_USER,
     to: process.env.BLOGGER_EMAIL,
@@ -48,6 +42,41 @@ for (const filePath of changedFiles) {
     await transporter.sendMail(mailOptions);
     console.log(`Uspešno poslano na Blogger: ${title}`);
   } catch (error) {
-    console.error(`Napaka pri pošiljanju ${filePath}:`, error);
+    console.error(`Napaka pri pošiljanju na Blogger za ${filePath}:`, error);
+  }
+
+  // 2. OBJAVA NA DEV.TO (preko REST API / Markdown)
+  const devToApiKey = process.env.DEVTO_API_KEY;
+
+  if (devToApiKey) {
+    try {
+      const response = await fetch('https://dev.to/api/articles', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'api-key': devToApiKey,
+        },
+        body: JSON.stringify({
+          article: {
+            title: title,
+            body_markdown: content,
+            published: true, // Nastavi na false, če želiš najprej osnutek (draft)
+            description: data.summary || '',
+          },
+        }),
+      });
+
+      if (response.ok) {
+        const resData = await response.json();
+        console.log(`Uspešno poslano na Dev.to: ${title} (${resData.url})`);
+      } else {
+        const errData = await response.json();
+        console.error(`Napaka Dev.to API (${response.status}):`, errData);
+      }
+    } catch (error) {
+      console.error(`Napaka pri povezavi z Dev.to za ${filePath}:`, error);
+    }
+  } else {
+    console.warn('DEVTO_API_KEY ni nastavljen v okoljskih spremenljivkah. Dev.to objava preskočena.');
   }
 }
