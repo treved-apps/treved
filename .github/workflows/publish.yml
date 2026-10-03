@@ -26,7 +26,13 @@ jobs:
       - name: Get changed files
         id: changed-files
         run: |
-          FILES=$(git diff --name-only --diff-filter=AM HEAD~1 HEAD | grep '^posts/.*\.md$' | xargs || true)
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            # Pri ročnem zagonu vzemi vse .md datoteke iz mape posts/
+            FILES=$(ls posts/*.md 2>/dev/null | xargs || true)
+          else
+            # Pri pushu vzemi samo spremenjene datoteke v zadnjem commitu
+            FILES=$(git diff --name-only --diff-filter=AM HEAD~1 HEAD | grep '^posts/.*\.md$' | xargs || true)
+          fi
           echo "files=$FILES" >> $GITHUB_OUTPUT
 
       - name: Run Publish Script
