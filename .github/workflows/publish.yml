@@ -23,28 +23,24 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Get changed markdown files
+      - name: Get changed files
         id: changed-files
         run: |
           FILES=$(git diff --name-only --diff-filter=AM HEAD~1 HEAD | grep '^posts/.*\.md$' | xargs || true)
           echo "files=$FILES" >> $GITHUB_OUTPUT
 
-      - name: Publish to Blogger
+      - name: Run Publish Script
         if: steps.changed-files.outputs.files != ''
         env:
-          BLOGGER_EMAIL: ${{ secrets.BLOGGER_EMAIL }}
+          GITHUB_EVENT_NAME: ${{ github.event_name }}
           SMTP_SERVER: ${{ secrets.SMTP_SERVER }}
           SMTP_PORT: ${{ secrets.SMTP_PORT }}
           SMTP_USER: ${{ secrets.SMTP_USER }}
           SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
-
+          BLOGGER_EMAIL: ${{ secrets.BLOGGER_EMAIL }}
           DEVTO_API_KEY: ${{ secrets.DEVTO_API_KEY }}
-
           MASTODON_TOKEN: ${{ secrets.MASTODON_TOKEN }}
           MASTODON_SERVER: ${{ secrets.MASTODON_SERVER }}
-
           BLUESKY_HANDLE: ${{ secrets.BLUESKY_HANDLE }}
           BLUESKY_PASSWORD: ${{ secrets.BLUESKY_PASSWORD }}
-
-          GITHUB_EVENT_NAME: ${{ github.event_name }}
         run: node scripts/publish.js ${{ steps.changed-files.outputs.files }}
