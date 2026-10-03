@@ -3,6 +3,7 @@ import path from 'path';
 import matter from 'gray-matter';
 import { marked } from 'marked';
 import nodemailer from 'nodemailer';
+import { BskyAgent } from '@atproto/api';
 
 const changedFiles = process.argv.slice(2);
 
@@ -114,5 +115,25 @@ for (const filePath of changedFiles) {
   }
 
 
-  
+  // 4. OBJAVA NA BLUESKY
+  const bskyHandle = process.env.BLUESKY_HANDLE;
+  const bskyPassword = process.env.BLUESKY_PASSWORD;
+
+  if (bskyHandle && bskyPassword) {
+    try {
+      const agent = new BskyAgent({ service: 'https://bsky.social' });
+      await agent.login({ identifier: bskyHandle, password: bskyPassword });
+
+      const statusText = `${title}\n\n${data.summary || ''}`;
+
+      await agent.post({
+        text: statusText,
+        createdAt: new Date().toISOString(),
+      });
+
+      console.log(`Uspešno poslano na Bluesky: ${title}`);
+    } catch (error) {
+      console.error(`Napaka pri povezavi z Bluesky za ${filePath}:`, error);
+    }
+  }
 }
