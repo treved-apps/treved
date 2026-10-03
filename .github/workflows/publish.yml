@@ -38,4 +38,7 @@ jobs:
           SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
 
           DEVTO_API_KEY: ${{ secrets.DEVTO_API_KEY }}
+
+          MASTODON_TOKEN: ${{ secrets.MASTODON_TOKEN }}
+          MASTODON_SERVER: ${{ secrets.MASTODON_SERVER }}
         run: node scripts/publish.js ${{ steps.changed-files.outputs.files }}
