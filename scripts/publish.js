@@ -3,14 +3,44 @@ import path from 'path';
 import matter from 'gray-matter';
 import { marked } from 'marked';
 import nodemailer from 'nodemailer';
-import { BskyAgent } from '@atproto/api';
 
-const changedFiles = process.argv.slice(2);
+let changedFiles = process.argv.slice(2);
+
+// Preveri, ali obstaja postConfig.txt z vsebino "scan-and-post-all"
+const configPath = path.join(process.cwd(), 'posts', 'postConfig.txt');
+let forceScanAll = false;
+
+if (fs.existsSync(configPath)) {
+  const configContent = fs.readFileSync(configPath, 'utf8').trim();
+  if (configContent === 'scan-and-post-all') {
+    forceScanAll = true;
+    console.log('Zaznana konfiguracija "scan-and-post-all" v postConfig.txt. Skeniram vse datoteke!');
+  }
+}
+
+// Preveri, ali je bil workflow zagnan ročno (preko okoljske spremenljivke)
+if (process.env.GITHUB_EVENT_NAME === 'workflow_dispatch') {
+  forceScanAll = true;
+  console.log('Workflow zagnan ročno (workflow_dispatch). Skeniram vse datoteke!');
+}
+
+// Če velja katerikoli pogoj za popolno skeniranje, naloži vse .md datoteke iz posts/
+if (forceScanAll || changedFiles.length === 0) {
+  const postsDir = path.join(process.cwd(), 'posts');
+  if (fs.existsSync(postsDir)) {
+    changedFiles = fs.readdirSync(postsDir)
+      .filter(file => file.endsWith('.md'))
+      .map(file => path.join('posts', file));
+  }
+}
 
 if (changedFiles.length === 0) {
-  console.log('Ni novih ali spremenjenih .md datotek.');
+  console.log('Ni novih ali spremenjenih .md datotek za obdelavo.');
   process.exit(0);
 }
+
+// Sledi obstoječa zanka za objavo...
+// for (const filePath of changedFiles) { ... }
 
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_SERVER,
