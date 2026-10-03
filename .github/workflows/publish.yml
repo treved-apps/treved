@@ -41,4 +41,7 @@ jobs:
 
           MASTODON_TOKEN: ${{ secrets.MASTODON_TOKEN }}
           MASTODON_SERVER: ${{ secrets.MASTODON_SERVER }}
+
+          BLUESKY_HANDLE: ${{ secrets.BLUESKY_HANDLE }}
+          BLUESKY_PASSWORD: ${{ secrets.BLUESKY_PASSWORD }}
         run: node scripts/publish.js ${{ steps.changed-files.outputs.files }}
